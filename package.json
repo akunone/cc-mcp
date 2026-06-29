@@ -1,0 +1,86 @@
+{
+    "$schema": "./@types/schema/package/index.json",
+    "package_version": 2,
+    "name": "cc-mvp",
+    "version": "1.0.0",
+    "author": "akun",
+    "editor": ">=3.8.7",
+    "scripts": {
+        "preinstall": "node ./scripts/preinstall.js",
+        "build": "npx tsc"
+    },
+    "description": "i18n:cc-mvp.description",
+    "main": "./dist/main.js",
+    "dependencies": {
+        "vue": "^3.1.4",
+        "fs-extra": "^10.0.0"
+    },
+    "devDependencies": {
+        "@cocos/creator-types": "^3.8.7",
+        "@types/fs-extra": "^9.0.5",
+        "@types/node": "^18.17.1",
+        "typescript": "^5.8.2"
+    },
+    "panels": {
+        "default": {
+            "title": "cc-mvp Default Panel",
+            "type": "dockable",
+            "main": "dist/panels/default",
+            "size": {
+                "min-width": 400,
+                "min-height": 300,
+                "width": 1024,
+                "height": 600
+            }
+        }
+    },
+    "contributions": {
+        "scene": {
+            "script": "dist/scene.js"
+        },
+        "menu": [
+            {
+                "path": "i18n:menu.panel/cc-mvp",
+                "label": "i18n:cc-mvp.open_panel",
+                "message": "open-panel"
+            },
+            {
+                "path": "i18n:menu.develop/cc-mvp",
+                "label": "i18n:cc-mvp.send_to_panel",
+                "message": "send-to-panel"
+            }
+        ],
+        "messages": {
+            "open-panel": {
+                "methods": [
+                    "openPanel"
+                ]
+            },
+            "send-to-panel": {
+                "methods": [
+                    "default.hello"
+                ]
+            },
+            "list-tools": {
+                "methods": [
+                    "listTools"
+                ]
+            },
+            "call-tool": {
+                "methods": [
+                    "callTool"
+                ]
+            },
+            "json-rpc": {
+                "methods": [
+                    "jsonRpc"
+                ]
+            },
+            "get-bridge-info": {
+                "methods": [
+                    "getBridgeInfo"
+                ]
+            }
+        }
+    }
+}
