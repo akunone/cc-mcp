@@ -788,6 +788,38 @@ export const TOOL_DEFINITIONS: ToolDefinition[] = [
         },
     },
     {
+        name: 'asset_find_image_references',
+        description:
+            'Find all prefab (.prefab) and scene (.scene) files that reference a specific image asset by its UUID. '
+            + 'Returns each file path, url, uuid, and the number of references found. '
+            + 'Use this before asset_replace_image_references to preview which files will be affected.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                source: { type: 'string', description: 'Asset path, db url (db://assets/...), or uuid of the source image.' },
+            },
+            required: ['source'],
+            additionalProperties: false,
+        },
+    },
+    {
+        name: 'asset_replace_image_references',
+        description:
+            'Replace all references to a source image with a target image across every prefab (.prefab) and scene (.scene) file in the project. '
+            + 'Performs a plain string replacement of the source asset UUID with the target asset UUID inside the JSON content of each file. '
+            + 'Use asset_find_image_references first (or pass dryRun: true) to preview affected files before actually modifying them.',
+        inputSchema: {
+            type: 'object',
+            properties: {
+                source: { type: 'string', description: 'Asset path, db url, or uuid of the source image to replace.' },
+                target: { type: 'string', description: 'Asset path, db url, or uuid of the target image to use instead.' },
+                dryRun: { type: 'boolean', description: 'If true, only list what would be changed without writing any files.' },
+            },
+            required: ['source', 'target'],
+            additionalProperties: false,
+        },
+    },
+    {
         name: 'log_get_logs',
         description: 'Read editor logs with optional filters.',
         inputSchema: {

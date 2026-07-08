@@ -1,6 +1,6 @@
-# cc-mvp
+# cc-mcp
 
-`cc-mvp` 是一个面向 AI / MCP 的 Cocos Creator 3.8 编辑器扩展。
+`cc-mcp` 是一个面向 AI / MCP 的 Cocos Creator 3.8 编辑器扩展。
 
 它把场景、节点、组件、预制体、预览、构建、资源和调试能力暴露成 MCP 工具，方便 Codex、Claude Code 或你自己的 MCP 客户端直接调用。
 
@@ -46,7 +46,7 @@
 您的项目/
 ├─ assets/
 ├─ extensions/
-│  └─ cc-mvp/
+│  └─ cc-mcp/
 │     ├─ source/
 │     ├─ dist/
 │     ├─ package.json
@@ -57,7 +57,7 @@
 安装依赖并构建：
 
 ```powershell
-cd E:\CocosWorkspace\Test33\extensions\cc-mvp
+cd E:\CocosWorkspace\Test33\extensions\cc-mcp
 npm install
 npm run build
 ```
@@ -65,7 +65,7 @@ npm run build
 然后在 Cocos Creator 里：
 
 1. 打开项目 `E:\CocosWorkspace\Test33`
-2. 启用或刷新 `cc-mvp`
+2. 启用或刷新 `cc-mcp`
 3. 在 AI 使用 MCP 的整个过程中保持 Creator 打开
 
 ## 先确认 bridge 正常
@@ -91,12 +91,12 @@ Invoke-RestMethod `
 
 ## 你可以怎么接
 
-`cc-mvp` 有三种常用入口：
+`cc-mcp` 有三种常用入口：
 
 1. 标准 `stdio` MCP server
 
 ```powershell
-node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 2. MCP JSON-RPC HTTP 端点
@@ -128,7 +128,7 @@ OpenAI 官方文档说明，Codex 的 MCP 可以通过 `codex mcp add` 或 `conf
 ### 方式 A：直接用命令添加
 
 ```powershell
-codex mcp add cc-mvp -- node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+codex mcp add cc-mcp -- node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 添加后可检查：
@@ -145,9 +145,9 @@ codex mcp add cc-mvp -- node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp
 示例：
 
 ```toml
-[mcp_servers.cc-mvp]
+[mcp_servers.cc-mcp]
 command = "node"
-args = ["E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js"]
+args = ["E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js"]
 cwd = "E:/CocosWorkspace/Test33"
 startup_timeout_sec = 20
 tool_timeout_sec = 600
@@ -162,10 +162,10 @@ enabled = true
 
 连上后，直接自然语言要求它调用工具即可，例如：
 
-- `用 cc-mvp 读取当前 Cocos 场景，并总结节点层级。`
-- `用 cc-mvp 打开 db://assets/scene.scene，然后启动浏览器预览。`
-- `用 cc-mvp 把当前选中的节点导出到 db://assets/prefabs/selected。`
-- `用 cc-mvp 做一次 web-mobile 构建，并等待构建完成。`
+- `用 cc-mcp 读取当前 Cocos 场景，并总结节点层级。`
+- `用 cc-mcp 打开 db://assets/scene.scene，然后启动浏览器预览。`
+- `用 cc-mcp 把当前选中的节点导出到 db://assets/prefabs/selected。`
+- `用 cc-mcp 做一次 web-mobile 构建，并等待构建完成。`
 
 比较常见的工具链路：
 
@@ -184,13 +184,13 @@ Anthropic 官方文档支持用 `claude mcp add --transport stdio <name> -- <com
 ### 方式 A：本地作用域，最省事
 
 ```powershell
-claude mcp add --transport stdio cc-mvp -- node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+claude mcp add --transport stdio cc-mcp -- node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 ### 方式 B：项目作用域，写入仓库 `.mcp.json`
 
 ```powershell
-claude mcp add --transport stdio cc-mvp --scope project -- node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+claude mcp add --transport stdio cc-mcp --scope project -- node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 Anthropic 目前的作用域语义是：
@@ -206,10 +206,10 @@ Anthropic 目前的作用域语义是：
 ```json
 {
   "mcpServers": {
-    "cc-mvp": {
+    "cc-mcp": {
       "command": "node",
       "args": [
-        "E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js"
+        "E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js"
       ],
       "env": {}
     }
@@ -221,7 +221,7 @@ Anthropic 目前的作用域语义是：
 
 ```powershell
 claude mcp list
-claude mcp get cc-mvp
+claude mcp get cc-mcp
 ```
 
 在 Claude Code 里：
@@ -234,10 +234,10 @@ claude mcp get cc-mvp
 
 例如：
 
-- `Use the cc-mvp MCP server to inspect the current Cocos scene.`
-- `Use cc-mvp to open db://assets/scene.scene and launch browser preview.`
-- `Use cc-mvp to export nodes named Enemy into db://assets/prefabs/enemies.`
-- `Use cc-mvp to build web-mobile and wait for completion.`
+- `Use the cc-mcp MCP server to inspect the current Cocos scene.`
+- `Use cc-mcp to open db://assets/scene.scene and launch browser preview.`
+- `Use cc-mcp to export nodes named Enemy into db://assets/prefabs/enemies.`
+- `Use cc-mcp to build web-mobile and wait for completion.`
 
 ## 如果你自己写客户端
 
@@ -353,12 +353,12 @@ Invoke-RestMethod `
 如果 Codex 或 Claude Code 不能正常调用：
 
 1. 确认 Creator 正在打开 `E:\CocosWorkspace\Test33`
-2. 确认 `cc-mvp` 已启用
+2. 确认 `cc-mcp` 已启用
 3. 确认 `http://127.0.0.1:17321/health` 返回成功
 4. 重新构建扩展：
 
 ```powershell
-cd E:\CocosWorkspace\Test33\extensions\cc-mvp
+cd E:\CocosWorkspace\Test33\extensions\cc-mcp
 npm run build
 ```
 

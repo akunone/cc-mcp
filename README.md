@@ -1,11 +1,11 @@
-# cc-mvp
+# cc-mcp
 
-`cc-mvp` is a Cocos Creator 3.8 editor extension that exposes scene, node, component, prefab, preview, build, asset, and debug operations as MCP tools.
+`cc-mcp` is a Cocos Creator 3.8 editor extension that exposes scene, node, component, prefab, preview, build, asset, and debug operations as MCP tools.
 
 It is designed for AI clients such as Codex and Claude Code:
 
 - Cocos Creator keeps the real editor state and executes the actual operations.
-- `cc-mvp` starts a local HTTP bridge at `http://127.0.0.1:17321`.
+- `cc-mcp` starts a local HTTP bridge at `http://127.0.0.1:17321`.
 - `dist/mcp-server.js` is a stdio MCP adapter that forwards MCP tool calls to that local bridge.
 
 ## What it provides
@@ -43,7 +43,7 @@ Place the extension in your project:
 YourProject/
 ├─ assets/
 ├─ extensions/
-│  └─ cc-mvp/
+│  └─ cc-mcp/
 │     ├─ source/
 │     ├─ dist/
 │     ├─ package.json
@@ -54,7 +54,7 @@ YourProject/
 Install and build:
 
 ```powershell
-cd E:\CocosWorkspace\Test33\extensions\cc-mvp
+cd E:\CocosWorkspace\Test33\extensions\cc-mcp
 npm install
 npm run build
 ```
@@ -62,7 +62,7 @@ npm run build
 Then in Cocos Creator:
 
 1. Open the project.
-2. Enable or refresh the `cc-mvp` extension.
+2. Enable or refresh the `cc-mcp` extension.
 3. Keep Creator open while your AI client uses MCP.
 
 ## Verify the bridge
@@ -88,12 +88,12 @@ Expected result:
 
 ## MCP endpoints
 
-`cc-mvp` exposes three practical entry points:
+`cc-mcp` exposes three practical entry points:
 
 1. Stdio MCP server
 
 ```powershell
-node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 2. HTTP JSON-RPC MCP endpoint
@@ -124,13 +124,13 @@ Codex CLI and the Codex IDE extension share the same MCP configuration. OpenAI d
 Run this once:
 
 ```powershell
-codex mcp add cc-mvp -- node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+codex mcp add cc-mcp -- node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 Then verify inside Codex:
 
 - Run `codex mcp --help` for MCP management commands
-- Run `/mcp` inside the Codex TUI to see whether `cc-mvp` is connected
+- Run `/mcp` inside the Codex TUI to see whether `cc-mcp` is connected
 
 ### Option B: add to `.codex/config.toml`
 
@@ -141,9 +141,9 @@ For this project, create or edit:
 Example:
 
 ```toml
-[mcp_servers.cc-mvp]
+[mcp_servers.cc-mcp]
 command = "node"
-args = ["E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js"]
+args = ["E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js"]
 cwd = "E:/CocosWorkspace/Test33"
 startup_timeout_sec = 20
 tool_timeout_sec = 600
@@ -158,10 +158,10 @@ If you prefer user-wide setup, put the same block in:
 
 Once the server is connected, you can ask Codex to call the tools naturally. Examples:
 
-- `Use cc-mvp to get the current Cocos scene and summarize the node hierarchy.`
-- `Open db://assets/scene.scene and start browser preview with cc-mvp.`
-- `Export the currently selected nodes to db://assets/prefabs/selected using cc-mvp.`
-- `Run a web-mobile build with cc-mvp and wait until it finishes.`
+- `Use cc-mcp to get the current Cocos scene and summarize the node hierarchy.`
+- `Open db://assets/scene.scene and start browser preview with cc-mcp.`
+- `Export the currently selected nodes to db://assets/prefabs/selected using cc-mcp.`
+- `Run a web-mobile build with cc-mcp and wait until it finishes.`
 
 Typical tool sequence:
 
@@ -180,7 +180,7 @@ Anthropic documents local stdio MCP servers with `claude mcp add --transport std
 This is the simplest setup and only affects your current project on your machine:
 
 ```powershell
-claude mcp add --transport stdio cc-mvp -- node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+claude mcp add --transport stdio cc-mcp -- node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 ### Option B: project scope
@@ -188,7 +188,7 @@ claude mcp add --transport stdio cc-mvp -- node E:/CocosWorkspace/Test33/extensi
 If you want the MCP server config written into `.mcp.json` for the repo:
 
 ```powershell
-claude mcp add --transport stdio cc-mvp --scope project -- node E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js
+claude mcp add --transport stdio cc-mcp --scope project -- node E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js
 ```
 
 Anthropic currently distinguishes these scopes:
@@ -204,10 +204,10 @@ If you want to write the project config manually:
 ```json
 {
   "mcpServers": {
-    "cc-mvp": {
+    "cc-mcp": {
       "command": "node",
       "args": [
-        "E:/CocosWorkspace/Test33/extensions/cc-mvp/dist/mcp-server.js"
+        "E:/CocosWorkspace/Test33/extensions/cc-mcp/dist/mcp-server.js"
       ],
       "env": {}
     }
@@ -221,7 +221,7 @@ Useful Claude Code commands:
 
 ```powershell
 claude mcp list
-claude mcp get cc-mvp
+claude mcp get cc-mcp
 ```
 
 Inside Claude Code:
@@ -234,10 +234,10 @@ Inside Claude Code:
 
 Examples:
 
-- `Use the cc-mvp MCP server to inspect the current Cocos scene.`
-- `Use cc-mvp to open db://assets/scene.scene and launch browser preview.`
-- `Use cc-mvp to export nodes named Enemy into db://assets/prefabs/enemies.`
-- `Use cc-mvp to build web-mobile and wait for completion.`
+- `Use the cc-mcp MCP server to inspect the current Cocos scene.`
+- `Use cc-mcp to open db://assets/scene.scene and launch browser preview.`
+- `Use cc-mcp to export nodes named Enemy into db://assets/prefabs/enemies.`
+- `Use cc-mcp to build web-mobile and wait for completion.`
 
 ## Direct HTTP usage
 
@@ -353,12 +353,12 @@ Use the high-level helper:
 If Codex or Claude Code cannot use the tools:
 
 1. Confirm Creator is open with `E:\CocosWorkspace\Test33`.
-2. Confirm `cc-mvp` is enabled.
+2. Confirm `cc-mcp` is enabled.
 3. Confirm `http://127.0.0.1:17321/health` returns success.
 4. Rebuild the extension:
 
 ```powershell
-cd E:\CocosWorkspace\Test33\extensions\cc-mvp
+cd E:\CocosWorkspace\Test33\extensions\cc-mcp
 npm run build
 ```
 

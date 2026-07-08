@@ -91,7 +91,7 @@ async function handleRequest(requestMessage: JsonRpcRequest): Promise<JsonRpcRes
                         tools: {},
                     },
                     serverInfo: {
-                        name: 'cc-mvp',
+                        name: 'cc-mcp',
                         version: '1.0.0',
                     },
                 },

@@ -1,5 +1,5 @@
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { basename, dirname, join } from 'path';
 import { TOOL_DEFINITIONS } from './tool-registry';
 // @ts-ignore
@@ -1104,6 +1104,128 @@ async function toolAssetReimportAsset(args: Record<string, unknown>) {
     return queryAssetInfo(target);
 }
 
+function escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function toolAssetFindImageReferences(args: Record<string, unknown>) {
+    const source = requireString(args.source, 'source');
+    const sourceUuid = await resolveAssetUuid(source);
+
+    const prefabs = await Editor.Message.request('asset-db', 'query-assets', {
+        pattern: 'db://assets/**/*.prefab',
+    }, ['uuid', 'url', 'path', 'file']) as any[];
+
+    const scenes = await Editor.Message.request('asset-db', 'query-assets', {
+        pattern: 'db://assets/**/*.scene',
+    }, ['uuid', 'url', 'path', 'file']) as any[];
+
+    const allAssets = [...(prefabs ?? []), ...(scenes ?? [])];
+    const sourceUrl = await Editor.Message.request('asset-db', 'query-url', sourceUuid).catch(() => null);
+    const sourcePath = await Editor.Message.request('asset-db', 'query-path', sourceUuid).catch(() => null);
+
+    const files: Array<{
+        uuid: string;
+        url: string;
+        path: string;
+        file: string;
+        refCount: number;
+    }> = [];
+    let totalRefs = 0;
+
+    const regex = new RegExp(escapeRegExp(sourceUuid), 'g');
+
+    for (const asset of allAssets) {
+        if (!asset.file || !existsSync(asset.file)) {
+            continue;
+        }
+        const content = readFileSync(asset.file, 'utf8');
+        const matches = content.match(regex);
+        const refCount = matches ? matches.length : 0;
+        if (refCount > 0) {
+            files.push({
+                uuid: asset.uuid,
+                url: asset.url,
+                path: asset.path,
+                file: asset.file,
+                refCount,
+            });
+            totalRefs += refCount;
+        }
+    }
+
+    return {
+        sourceUuid,
+        sourceUrl,
+        sourcePath,
+        totalFiles: files.length,
+        totalReferences: totalRefs,
+        files,
+    };
+}
+
+async function toolAssetReplaceImageReferences(args: Record<string, unknown>) {
+    const source = requireString(args.source, 'source');
+    const target = requireString(args.target, 'target');
+    const dryRun = optionalBoolean(args.dryRun) ?? false;
+
+    const sourceUuid = await resolveAssetUuid(source);
+    const targetUuid = await resolveAssetUuid(target);
+
+    if (sourceUuid === targetUuid) {
+        throw new Error('Source and target resolve to the same asset UUID. No changes made.');
+    }
+
+    // Reuse the find logic to discover affected files
+    const findResult = await toolAssetFindImageReferences({ source });
+    const files = (findResult as any).files ?? [];
+
+    const results: Array<{
+        uuid: string;
+        url: string;
+        path: string;
+        file: string;
+        refCount: number;
+        replaced: boolean;
+        error?: string;
+    }> = [];
+
+    for (const fileInfo of files) {
+        try {
+            if (!dryRun) {
+                let content = readFileSync(fileInfo.file, 'utf8');
+                const regex = new RegExp(escapeRegExp(sourceUuid), 'g');
+                content = content.replace(regex, targetUuid);
+                writeFileSync(fileInfo.file, content, 'utf8');
+            }
+            results.push({ ...fileInfo, replaced: !dryRun });
+        } catch (err) {
+            results.push({
+                ...fileInfo,
+                replaced: false,
+                error: err instanceof Error ? err.message : String(err),
+            });
+        }
+    }
+
+    // Refresh the asset database when files were actually modified
+    if (!dryRun && results.length > 0) {
+        await Editor.Message.request('asset-db', 'refresh-asset', 'db://assets');
+    }
+
+    const targetUrl = await Editor.Message.request('asset-db', 'query-url', targetUuid).catch(() => null);
+
+    return {
+        sourceUuid,
+        targetUuid,
+        targetUrl,
+        dryRun,
+        totalFiles: results.length,
+        totalReferences: results.reduce((sum, r) => sum + r.refCount, 0),
+        files: results,
+    };
+}
+
 async function toolLogGetLogs(args: Record<string, unknown>) {
     const type = optionalString(args.type);
     const processType = optionalString(args.process);
@@ -1323,6 +1445,10 @@ async function callTool(name: string, args: Record<string, unknown> = {}) {
         return toolAssetImportAsset(args);
     case 'asset_reimport_asset':
         return toolAssetReimportAsset(args);
+    case 'asset_find_image_references':
+        return toolAssetFindImageReferences(args);
+    case 'asset_replace_image_references':
+        return toolAssetReplaceImageReferences(args);
     case 'log_get_logs':
         return toolLogGetLogs(args);
     case 'log_clear_logs':
